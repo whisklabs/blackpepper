@@ -31,6 +31,20 @@ class ModifyColumn[RR](col: AbstractColumn[RR]) extends AbstractModifyColumn[RR]
   def toCType(v: RR): AnyRef = col.toCType(v)
 }
 
+class SeqLikeModifyColumn[RR: CSPrimitive](col: SeqColumn[RR]) extends ModifyColumn[Seq[RR]](col) {
+
+  def prepend(value: RR): Assignment = QueryBuilder.prepend(col.name, CSPrimitive[RR].toCType(value))
+  def prependAll[L <% Seq[RR]](values: L): Assignment = QueryBuilder.prependAll(col.name, values.map(CSPrimitive[RR].toCType).toList.asJava)
+  def append(value: RR): Assignment = QueryBuilder.append(col.name, CSPrimitive[RR].toCType(value))
+  def appendAll[L <% Seq[RR]](values: L): Assignment = QueryBuilder.appendAll(col.name, values.map(CSPrimitive[RR].toCType).toList.asJava)
+}
+
+class SetLikeModifyColumn[RR: CSPrimitive](col: SetColumn[RR]) extends ModifyColumn[Set[RR]](col) {
+
+  def add(value: RR): Assignment = QueryBuilder.add(col.name, CSPrimitive[RR].toCType(value))
+  def addAll[L <% Traversable[RR]](values: L): Assignment = QueryBuilder.addAll(col.name, values.map(CSPrimitive[RR].toCType).toSet.asJava)
+}
+
 class ModifyColumnOptional[RR](col: OptionalColumn[RR]) extends AbstractModifyColumn[Option[RR]](col.name) {
 
   def toCType(v: Option[RR]): AnyRef = v.map(col.toCType).orNull

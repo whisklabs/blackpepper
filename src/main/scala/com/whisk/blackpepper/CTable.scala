@@ -23,6 +23,9 @@ abstract class CTable[T <: CTable[T, R], R](val tableName: String) {
   def seqColumn[RR: CSPrimitive](name: String): SeqColumn[RR] =
     new SeqColumn[RR](name)
 
+  def setColumn[RR: CSPrimitive](name: String): SetColumn[RR] =
+    new SetColumn[RR](name)
+
   def mapColumn[K: CSPrimitive, V: CSPrimitive](name: String) =
     new MapColumn[K, V](name)
 

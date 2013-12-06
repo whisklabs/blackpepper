@@ -24,7 +24,11 @@ object Implicits {
   }
 
   implicit def seqColumnToAssignment[RR: CSPrimitive](col: SeqColumn[RR]) = {
-    new ModifyColumn[Seq[RR]](col)
+    new SeqLikeModifyColumn[RR](col)
+  }
+
+  implicit def setColumnToAssignment[RR: CSPrimitive](col: SetColumn[RR]) = {
+    new SetLikeModifyColumn[RR](col)
   }
 
   implicit def jsonSeqColumnToAssignment[RR: Format](col: JsonTypeSeqColumn[RR]) = {

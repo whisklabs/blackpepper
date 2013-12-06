@@ -77,6 +77,20 @@ class SeqColumn[RR: CSPrimitive](val name: String) extends Column[Seq[RR]] {
   }
 }
 
+class SetColumn[RR: CSPrimitive](val name: String) extends Column[Set[RR]] {
+
+  def toCType(values: Set[RR]): AnyRef = values.map(CSPrimitive[RR].toCType).asJava
+
+  override def apply(r: Row): Set[RR] = {
+    optional(r).getOrElse(Set.empty)
+  }
+
+  def optional(r: Row): Option[Set[RR]] = {
+    val i = implicitly[CSPrimitive[RR]]
+    Option(r.getSet(name, i.cls)).map(_.asScala.map(e => i.fromCType(e.asInstanceOf[AnyRef])).toSet)
+  }
+}
+
 class MapColumn[K: CSPrimitive, V: CSPrimitive](val name: String) extends Column[Map[K, V]] {
 
   def toCType(values: Map[K, V]): AnyRef = values.map { case (k, v) => CSPrimitive[K].toCType(k) -> CSPrimitive[V].toCType(v) }.asJava

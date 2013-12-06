@@ -1,45 +1,11 @@
 package com.whisk.blackpepper.test
 
-import com.whisk.blackpepper._
 import com.whisk.blackpepper.Implicits._
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
-import com.datastax.driver.core.{ Session, Row }
+import com.datastax.driver.core.Session
 import scala.concurrent.{ Await, Future }
-import play.api.libs.json.Json
-import java.util.UUID
 import com.datastax.driver.core.utils.UUIDs
-
-case class Author(firstName: String, lastName: String, bio: Option[String])
-
-case class Recipe(
-  url: String,
-  description: Option[String],
-  ingredients: Seq[String],
-  author: Option[Author],
-  servings: Option[Int],
-  lastCheckedAt: java.util.Date,
-  props: Map[String, String])
-
-class Recipes extends CTable[Recipes, Recipe]("recipes") {
-
-  implicit val authorFmt = Json.format[Author]
-
-  override def fromRow(r: Row): Recipe = {
-    Recipe(url(r), description(r), ingredients(r), author.optional(r), servings(r), lastCheckedAt(r), props(r))
-  }
-
-  val url = column[String]("url")
-  val description = optColumn[String]("description")
-  val ingredients = seqColumn[String]("ingredients")
-  val author = jsonColumn[Author]("author")
-  val servings = optColumn[Int]("servings")
-  val lastCheckedAt = column[java.util.Date]("last_checked_at")
-  val props = mapColumn[String, String]("props")
-  val uid = column[UUID]("uid")
-}
-
-object Recipes extends Recipes
 
 class BlackpepperSpec extends CassandraSpec {
 
@@ -54,7 +20,7 @@ class BlackpepperSpec extends CassandraSpec {
   "Blackpepper DSL" should {
 
     val author = Author("Tony", "Clark", Some("great chef..."))
-    val r = Recipe("recipe_url", Some("desc"), Seq("ingr1", "ingr2"), Some(author), Some(4), new java.util.Date, Map("a" -> "b", "c" -> "d"))
+    val r = Recipe("recipe_url", Some("desc"), Seq("ingr1", "ingr2"), Some(author), Some(4), new java.util.Date, Map("a" -> "b", "c" -> "d"), Set("tag1", "tag2"))
 
     "support inserting, updating and deleting rows" in {
       Recipes.insert
@@ -66,6 +32,7 @@ class BlackpepperSpec extends CassandraSpec {
         .value(_.lastCheckedAt, r.lastCheckedAt)
         .value(_.props, r.props)
         .value(_.uid, UUIDs.timeBased())
+        .value(_.tags, r.tags)
         .execute().sync()
 
       val recipeF: Future[Option[Recipe]] = Recipes.select.one
@@ -73,7 +40,7 @@ class BlackpepperSpec extends CassandraSpec {
 
       Recipes.select.fetch.sync() should contain(r)
 
-      Recipes.update.where(_.url eqs r.url).modify(_.description setTo Some("new desc")).execute().sync()
+      Recipes.update.where(_.url eqs r.url).modify(_.description setTo Some("new desc")).and(_.tags add "tag3").execute().sync()
 
       Recipes.select(_.description).where(_.url eqs r.url).one.map(_.flatten).sync() should beSome("new desc")
 
