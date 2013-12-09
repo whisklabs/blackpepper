@@ -31,6 +31,10 @@ object Implicits {
     new SetLikeModifyColumn[RR](col)
   }
 
+  implicit def mapColumnToAssignment[A: CSPrimitive, B: CSPrimitive](col: MapColumn[A, B]) = {
+    new MapLikeModifyColumn[A, B](col)
+  }
+
   implicit def jsonSeqColumnToAssignment[RR: Format](col: JsonTypeSeqColumn[RR]) = {
     new ModifyColumn[Seq[RR]](col)
   }

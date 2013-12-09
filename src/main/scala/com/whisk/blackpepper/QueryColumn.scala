@@ -45,6 +45,15 @@ class SetLikeModifyColumn[RR: CSPrimitive](col: SetColumn[RR]) extends ModifyCol
   def addAll[L <% Traversable[RR]](values: L): Assignment = QueryBuilder.addAll(col.name, values.map(CSPrimitive[RR].toCType).toSet.asJava)
 }
 
+class MapLikeModifyColumn[A: CSPrimitive, B: CSPrimitive](col: MapColumn[A, B]) extends ModifyColumn[Map[A, B]](col) {
+
+  def put(value: (A, B)): Assignment = QueryBuilder.put(col.name, CSPrimitive[A].toCType(value._1), CSPrimitive[B].toCType(value._2))
+  def putAll[L <% Traversable[(A, B)]](values: L): Assignment = {
+    val map = values.map({ case (k, v) => CSPrimitive[A].toCType(k) -> CSPrimitive[B].toCType(v) }).toMap.asJava
+    QueryBuilder.putAll(col.name, map)
+  }
+}
+
 class ModifyColumnOptional[RR](col: OptionalColumn[RR]) extends AbstractModifyColumn[Option[RR]](col.name) {
 
   def toCType(v: Option[RR]): AnyRef = v.map(col.toCType).orNull

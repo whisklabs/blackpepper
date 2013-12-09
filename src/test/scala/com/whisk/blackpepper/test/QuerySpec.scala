@@ -31,6 +31,12 @@ class QuerySpec extends Specification {
       Recipes.update.where(_.url eqs "url").modify(_.ingredients prepend "ingr1").qb.toString must_==
         "UPDATE recipes SET ingredients=['ingr1']+ingredients WHERE url='url';"
 
+      //Map
+      Recipes.update.where(_.url eqs "url").modify(_.props put ("k1", "v1")).qb.toString must_==
+        "UPDATE recipes SET props['k1']='v1' WHERE url='url';"
+
+      Recipes.update.where(_.url eqs "url").modify(_.props putAll Map("k1" -> "v1", "k2" -> "v2")).qb.toString must_==
+        "UPDATE recipes SET props=props+{'k1':'v1','k2':'v2'} WHERE url='url';"
     }
   }
 }
