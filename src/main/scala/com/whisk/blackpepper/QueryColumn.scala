@@ -37,12 +37,16 @@ class SeqLikeModifyColumn[RR: CSPrimitive](col: SeqColumn[RR]) extends ModifyCol
   def prependAll[L <% Seq[RR]](values: L): Assignment = QueryBuilder.prependAll(col.name, values.map(CSPrimitive[RR].toCType).toList.asJava)
   def append(value: RR): Assignment = QueryBuilder.append(col.name, CSPrimitive[RR].toCType(value))
   def appendAll[L <% Seq[RR]](values: L): Assignment = QueryBuilder.appendAll(col.name, values.map(CSPrimitive[RR].toCType).toList.asJava)
+  def remove(value: RR): Assignment = QueryBuilder.remove(col.name, CSPrimitive[RR].toCType(value))
+  def removeAll[L <% Seq[RR]](values: L): Assignment = QueryBuilder.removeAll(col.name, values.map(CSPrimitive[RR].toCType).toSet.asJava)
 }
 
 class SetLikeModifyColumn[RR: CSPrimitive](col: SetColumn[RR]) extends ModifyColumn[Set[RR]](col) {
 
   def add(value: RR): Assignment = QueryBuilder.add(col.name, CSPrimitive[RR].toCType(value))
   def addAll[L <% Traversable[RR]](values: L): Assignment = QueryBuilder.addAll(col.name, values.map(CSPrimitive[RR].toCType).toSet.asJava)
+  def remove(value: RR): Assignment = QueryBuilder.remove(col.name, CSPrimitive[RR].toCType(value))
+  def removeAll[L <% Seq[RR]](values: L): Assignment = QueryBuilder.removeAll(col.name, values.map(CSPrimitive[RR].toCType).toSet.asJava)
 }
 
 class MapLikeModifyColumn[A: CSPrimitive, B: CSPrimitive](col: MapColumn[A, B]) extends ModifyColumn[Map[A, B]](col) {
@@ -52,6 +56,8 @@ class MapLikeModifyColumn[A: CSPrimitive, B: CSPrimitive](col: MapColumn[A, B]) 
     val map = values.map({ case (k, v) => CSPrimitive[A].toCType(k) -> CSPrimitive[B].toCType(v) }).toMap.asJava
     QueryBuilder.putAll(col.name, map)
   }
+  def remove(key: A): Assignment = QueryBuilder.remove(col.name, CSPrimitive[A].toCType(key))
+  def removeAll[L <% Seq[A]](keys: L): Assignment = QueryBuilder.removeAll(col.name, keys.map(CSPrimitive[A].toCType).toSet.asJava)
 }
 
 class ModifyColumnOptional[RR](col: OptionalColumn[RR]) extends AbstractModifyColumn[Option[RR]](col.name) {
