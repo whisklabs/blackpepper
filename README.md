@@ -9,8 +9,8 @@ Consider [BlackpepperSpec.scala](https://github.com/whiskteam/blackpepper/blob/m
 
 ## Dependency
 
-    resolvers += "Whisk Snapshots" at "http://whiskteam.github.io/mvn-repo/snapshots/"
+    resolvers += "Whisk Snapshots" at "http://whisklabs.github.io/mvn-repo/snapshots/"
     
-    libraryDependencies += "com.whisk" %% "blackpepper" % "0.1.0-ad2a00c"
+    libraryDependencies += "com.whisk" %% "blackpepper" % "0.1.0-9f71a3d"
 
     
