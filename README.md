@@ -11,6 +11,6 @@ Consider [BlackpepperSpec.scala](https://github.com/whiskteam/blackpepper/blob/m
 
     resolvers += "Whisk Snapshots" at "http://whisklabs.github.io/mvn-repo/snapshots/"
     
-    libraryDependencies += "com.whisk" %% "blackpepper" % "0.1.0-c8100d0"
+    libraryDependencies += "com.whisk" %% "blackpepper" % "0.1.0-b02aa73"
 
     
