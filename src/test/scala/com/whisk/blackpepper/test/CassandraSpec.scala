@@ -40,5 +40,5 @@ trait CassandraSpec extends mutable.Specification with CassandraCluster {
     session.execute(recipesTable)
   }
 
-  override def map(fs: => Fragments) = Step(start) ^ fs ^ Step(cluster.shutdown())
+  override def map(fs: => Fragments) = Step(start) ^ fs ^ Step(cluster.close())
 }
