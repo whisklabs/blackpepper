@@ -17,7 +17,7 @@ class QuerySpec extends Specification {
       Recipes.update.where(_.url eqs "url").modify(_.tags add "tag1").qb.toString must_==
         "UPDATE recipes SET tags=tags+{'tag1'} WHERE url='url';"
 
-      Recipes.update.where(_.url eqs "url").modify(_.tags addAll Seq("tag1", "tag2")).qb.toString must_==
+      Recipes.update.where(_.url eqs "url").modify(_.tags addAll Set("tag1", "tag2")).qb.toString must_==
         "UPDATE recipes SET tags=tags+{'tag1','tag2'} WHERE url='url';"
 
       //Json

@@ -14,8 +14,11 @@ abstract class CTable[T <: CTable[T, R], R](val tableName: String) {
   def optColumn[RR: CSPrimitive](name: String): OptionalPrimitiveColumn[RR] =
     new OptionalPrimitiveColumn[RR](name)
 
-  def jsonColumn[RR: Format](name: String): JsonTypeColumn[RR] =
-    new JsonTypeColumn[RR](name)
+  def jsonColumn[RR: Format](name: String): JsonColumn[RR] =
+    new JsonColumn[RR](name)
+
+  def optionalJsonColumn[RR: Format](name: String): OptionalJsonColumn[RR] =
+    new OptionalJsonColumn[RR](name)
 
   def enumColumn[EnumType <: Enumeration](enum: EnumType, name: String): EnumColumn[EnumType] =
     new EnumColumn[EnumType](enum, name)
@@ -29,8 +32,14 @@ abstract class CTable[T <: CTable[T, R], R](val tableName: String) {
   def mapColumn[K: CSPrimitive, V: CSPrimitive](name: String) =
     new MapColumn[K, V](name)
 
-  def jsonSeqColumn[RR: Format](name: String): JsonTypeSeqColumn[RR] =
-    new JsonTypeSeqColumn[RR](name)
+  def jsonSeqColumn[RR: Format](name: String): JsonSeqColumn[RR] =
+    new JsonSeqColumn[RR](name)
+
+  def jsonSetColumn[RR: Format](name: String): JsonSetColumn[RR] =
+    new JsonSetColumn[RR](name)
+
+  def jsonMapColumn[K: CSPrimitive, V: Format](name: String): JsonMapColumn[K, V] =
+    new JsonMapColumn[K, V](name)
 
   def select: SelectQuery[T, R] =
     new SelectQuery[T, R](this.asInstanceOf[T], QueryBuilder.select().from(tableName), this.asInstanceOf[T].fromRow)

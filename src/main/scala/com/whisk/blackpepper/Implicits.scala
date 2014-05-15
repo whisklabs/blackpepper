@@ -19,24 +19,20 @@ object Implicits {
     new ModifyColumn[RR#Value](col)
   }
 
-  implicit def jsonColumnToAssignment[RR: Format](col: JsonTypeColumn[RR]) = {
+  implicit def jsonColumnToAssignment[RR: Format](col: JsonColumn[RR]) = {
     new ModifyColumn[RR](col)
   }
 
-  implicit def seqColumnToAssignment[RR: CSPrimitive](col: SeqColumn[RR]) = {
+  implicit def seqColumnToAssignment[RR](col: AbstractSeqColumn[RR]) = {
     new SeqLikeModifyColumn[RR](col)
   }
 
-  implicit def setColumnToAssignment[RR: CSPrimitive](col: SetColumn[RR]) = {
+  implicit def setColumnToAssignment[RR](col: AbstractSetColumn[RR]) = {
     new SetLikeModifyColumn[RR](col)
   }
 
-  implicit def mapColumnToAssignment[A: CSPrimitive, B: CSPrimitive](col: MapColumn[A, B]) = {
+  implicit def mapColumnToAssignment[A, B](col: AbstractMapColumn[A, B]) = {
     new MapLikeModifyColumn[A, B](col)
-  }
-
-  implicit def jsonSeqColumnToAssignment[RR: Format](col: JsonTypeSeqColumn[RR]) = {
-    new ModifyColumn[Seq[RR]](col)
   }
 
   implicit def columnIsSelectable[T](col: Column[T]): SelectColumn[T] =

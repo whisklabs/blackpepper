@@ -1,8 +1,10 @@
 package com.whisk.blackpepper
 
 import com.datastax.driver.core.Row
+import java.util.{ List => JavaList, Set => JavaSet, Map => JavaMap }
 import play.api.libs.json.{ Json, Format }
 import scala.collection.JavaConverters._
+import scala.util.Try
 
 trait AbstractColumn[T] extends CSWrites[T] {
 
@@ -45,15 +47,6 @@ class PrimitiveColumn[RR: CSPrimitive](val name: String) extends Column[RR] {
     implicitly[CSPrimitive[RR]].fromRow(r, name)
 }
 
-class JsonTypeColumn[RR: Format](val name: String) extends Column[RR] {
-
-  def toCType(v: RR): AnyRef = Json.stringify(Json.toJson(v))
-
-  def optional(r: Row): Option[RR] = {
-    Option(r.getString(name)).flatMap(e => Json.fromJson(Json.parse(e)).asOpt)
-  }
-}
-
 class EnumColumn[EnumType <: Enumeration](enum: EnumType, val name: String) extends Column[EnumType#Value] {
 
   def toCType(v: EnumType#Value): AnyRef = v.toString
@@ -63,61 +56,105 @@ class EnumColumn[EnumType <: Enumeration](enum: EnumType, val name: String) exte
 
 }
 
-class SeqColumn[RR: CSPrimitive](val name: String) extends Column[Seq[RR]] {
+trait CollectionValueDefinition[RR] {
 
-  def toCType(values: Seq[RR]): AnyRef = values.map(CSPrimitive[RR].toCType).asJava
+  def valueCls: Class[_]
+  def valueToCType(v: RR): AnyRef
+  def valueFromCType(c: AnyRef): RR
+}
+
+trait PrimitiveCollecitonValue[R] extends CollectionValueDefinition[R] {
+
+  def valuePrimitive: CSPrimitive[R]
+
+  override def valueCls = valuePrimitive.cls
+
+  override def valueToCType(v: R): AnyRef = valuePrimitive.toCType(v)
+
+  override def valueFromCType(c: AnyRef): R = valuePrimitive.fromCType(c)
+
+}
+
+abstract class AbstractSeqColumn[RR] extends Column[Seq[RR]] with CollectionValueDefinition[RR] {
+
+  def valuesToCType(values: Iterable[RR]): JavaList[AnyRef] =
+    values.map(valueToCType).toList.asJava
+
+  override def toCType(values: Seq[RR]): AnyRef = valuesToCType(values)
 
   override def apply(r: Row): Seq[RR] = {
-    optional(r).getOrElse(Seq.empty)
+    optional(r).getOrElse(Nil)
   }
 
-  def optional(r: Row): Option[Seq[RR]] = {
-    val i = implicitly[CSPrimitive[RR]]
-    Option(r.getList(name, i.cls)).map(_.asScala.map(e => i.fromCType(e.asInstanceOf[AnyRef])).toIndexedSeq)
+  override def optional(r: Row): Option[Seq[RR]] = {
+    Try {
+      r.getList(name, valueCls).asScala.map(e => valueFromCType(e.asInstanceOf[AnyRef])).toList
+    }.toOption
   }
 }
 
-class SetColumn[RR: CSPrimitive](val name: String) extends Column[Set[RR]] {
+abstract class AbstractSetColumn[RR] extends Column[Set[RR]] with CollectionValueDefinition[RR] {
 
-  def toCType(values: Set[RR]): AnyRef = values.map(CSPrimitive[RR].toCType).asJava
+  def valuesToCType(values: Iterable[RR]): JavaSet[AnyRef] =
+    values.map(valueToCType).toSet.asJava
+
+  override def toCType(values: Set[RR]): AnyRef = valuesToCType(values)
 
   override def apply(r: Row): Set[RR] = {
-    optional(r).getOrElse(Set.empty)
+    optional(r).getOrElse(Set.empty[RR])
   }
 
-  def optional(r: Row): Option[Set[RR]] = {
-    val i = implicitly[CSPrimitive[RR]]
-    Option(r.getSet(name, i.cls)).map(_.asScala.map(e => i.fromCType(e.asInstanceOf[AnyRef])).toSet)
+  override def optional(r: Row): Option[Set[RR]] = {
+    Try {
+      r.getSet(name, valueCls).asScala.map(e => valueFromCType(e.asInstanceOf[AnyRef])).toSet
+    }.toOption
   }
 }
 
-class MapColumn[K: CSPrimitive, V: CSPrimitive](val name: String) extends Column[Map[K, V]] {
+abstract class AbstractMapColumn[K, V] extends Column[Map[K, V]] with CollectionValueDefinition[V] {
 
-  def toCType(values: Map[K, V]): AnyRef = values.map { case (k, v) => CSPrimitive[K].toCType(k) -> CSPrimitive[V].toCType(v) }.asJava
+  def keyCls: Class[_]
+
+  def keyToCType(v: K): AnyRef
+
+  def keyFromCType(c: AnyRef): K
+
+  def valuesToCType(values: Traversable[(K, V)]): JavaMap[AnyRef, AnyRef] =
+    values.map({ case (k, v) => keyToCType(k) -> valueToCType(v) }).toMap.asJava
+
+  override def toCType(values: Map[K, V]): AnyRef = valuesToCType(values)
 
   override def apply(r: Row): Map[K, V] = {
-    optional(r).getOrElse(Map.empty)
+    optional(r).getOrElse(Map.empty[K, V])
   }
 
   def optional(r: Row): Option[Map[K, V]] = {
-    val ki = implicitly[CSPrimitive[K]]
-    val vi = implicitly[CSPrimitive[V]]
-    Option(r.getMap(name, ki.cls, vi.cls)).map(_.asScala.map {
+    Option(r.getMap(name, keyCls, valueCls)).map(_.asScala.map {
       case (k, v) =>
-        ki.fromCType(k.asInstanceOf[AnyRef]) -> vi.fromCType(v.asInstanceOf[AnyRef])
-    } toMap)
+        keyFromCType(k.asInstanceOf[AnyRef]) -> valueFromCType(v.asInstanceOf[AnyRef])
+    }.toMap)
   }
 }
 
-class JsonTypeSeqColumn[RR: Format](val name: String) extends Column[Seq[RR]] {
+class SeqColumn[RR: CSPrimitive](val name: String) extends AbstractSeqColumn[RR] with PrimitiveCollecitonValue[RR] {
 
-  def toCType(values: Seq[RR]): AnyRef = values.map(v => Json.stringify(Json.toJson(v))).asJava
+  override val valuePrimitive = CSPrimitive[RR]
+}
 
-  override def apply(r: Row): Seq[RR] = {
-    optional(r).getOrElse(Seq.empty)
-  }
+class SetColumn[RR: CSPrimitive](val name: String) extends AbstractSetColumn[RR] with PrimitiveCollecitonValue[RR] {
 
-  def optional(r: Row): Option[Seq[RR]] = {
-    Option(r.getList(name, classOf[String])).map(_.asScala.flatMap(e => Json.fromJson(Json.parse(e)).asOpt))
-  }
+  override val valuePrimitive = CSPrimitive[RR]
+}
+
+class MapColumn[K: CSPrimitive, V: CSPrimitive](val name: String) extends AbstractMapColumn[K, V] with PrimitiveCollecitonValue[V] {
+
+  val keyPrimitive = CSPrimitive[K]
+
+  override def keyCls: Class[_] = keyPrimitive.cls
+
+  override def keyToCType(v: K): AnyRef = keyPrimitive.toCType(v)
+
+  override def keyFromCType(c: AnyRef): K = keyPrimitive.fromCType(c)
+
+  override val valuePrimitive = CSPrimitive[V]
 }
