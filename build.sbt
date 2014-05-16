@@ -8,7 +8,9 @@ gitHeadCommitSha in ThisBuild := Process("git rev-parse --short HEAD").lines.hea
 
 version in ThisBuild := "0.1.0-" + gitHeadCommitSha.value
 
-scalaVersion := "2.10.4"
+scalaVersion := "2.11.0"
+
+crossScalaVersions := Seq("2.11.0", "2.10.4")
 
 scalariformSettings
 
@@ -17,7 +19,7 @@ scalacOptions ++= Seq("-Xcheckinit", "-encoding", "utf8", "-deprecation", "-unch
 resolvers += "typesafe" at "http://repo.typesafe.com/typesafe/releases/"
 
 libraryDependencies ++= Seq(
-  "com.typesafe.play" %% "play-json" % "2.2.1",
+  "com.typesafe.play" %% "play-json" % "2.3.0-RC1",
   "com.datastax.cassandra" % "cassandra-driver-core" % "2.0.2",
   "org.apache.cassandra" % "cassandra-all" % "2.0.2" % "test",
   "org.specs2" %% "specs2-core" % "2.3.11" % "test")
