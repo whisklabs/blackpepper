@@ -26,6 +26,12 @@ object CSPrimitive {
     def fromRow(row: Row, name: String): Option[Int] = Option(row.getInt(name))
   }
 
+  implicit object LongIsCSPrimitive extends CSPrimitive[Long] {
+
+    def cls: Class[_] = classOf[java.lang.Long]
+    def fromRow(row: Row, name: String): Option[Long] = Option(row.getLong(name))
+  }
+
   implicit object StringIsCSPrimitive extends CSPrimitive[String] {
 
     def cls: Class[_] = classOf[java.lang.String]
