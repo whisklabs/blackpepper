@@ -4,7 +4,7 @@ import com.datastax.driver.core.Row
 import com.datastax.driver.core.querybuilder._
 import play.api.libs.json.Format
 import scala.language.experimental.macros
-import scala.reflect.macros.whitebox.Context
+import scala.reflect.macros.Context
 
 object CTableMacros {
 
