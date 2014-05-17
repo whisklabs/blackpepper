@@ -25,7 +25,7 @@ class Recipes extends CTable[Recipes, Recipe]("recipes") {
     Recipe(url(r), description(r), ingredients(r), author.optional(r), servings(r), lastCheckedAt(r), props(r), tags(r))
   }
 
-  val url = column[String]("url")
+  val url = column[String]
   val description = optColumn[String]("description")
   val ingredients = seqColumn[String]("ingredients")
   val author = jsonColumn[Author]("author")

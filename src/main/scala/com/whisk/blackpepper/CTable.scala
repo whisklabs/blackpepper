@@ -3,10 +3,28 @@ package com.whisk.blackpepper
 import com.datastax.driver.core.Row
 import com.datastax.driver.core.querybuilder._
 import play.api.libs.json.Format
+import scala.language.experimental.macros
+import scala.reflect.macros.whitebox.Context
+
+object CTableMacros {
+
+  def macroCol[T](c: Context)(implicit e1: c.WeakTypeTag[T]): c.Expr[PrimitiveColumn[T]] = {
+    import c.universe._
+    val tpe = weakTypeOf[T]
+
+    val field: String = c.enclosingClass.collect({
+      case ValDef(_, name, _, rhs) if rhs.pos == c.macroApplication.pos => name.decodedName.toString
+    }).headOption.getOrElse(c.abort(c.enclosingPosition, "invalid definition"))
+
+    c.Expr[PrimitiveColumn[T]](q"""new com.whisk.blackpepper.PrimitiveColumn[$tpe]($field)""")
+  }
+}
 
 abstract class CTable[T <: CTable[T, R], R](val tableName: String) {
 
   def fromRow(r: Row): R
+
+  def column[RR]: PrimitiveColumn[RR] = macro CTableMacros.macroCol[RR]
 
   def column[RR: CSPrimitive](name: String): PrimitiveColumn[RR] =
     new PrimitiveColumn[RR](name)
