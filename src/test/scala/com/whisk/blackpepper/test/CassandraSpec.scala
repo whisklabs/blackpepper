@@ -35,7 +35,8 @@ trait CassandraSpec extends mutable.Specification with CassandraCluster {
         |tags set<text>,
         |last_checked_at timestamp,
         |props map<text, text>,
-        |uid timeuuid);
+        |uid timeuuid,
+        |difficulty text);
       """.stripMargin
     session.execute(recipesTable)
   }

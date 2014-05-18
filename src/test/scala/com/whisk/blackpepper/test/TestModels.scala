@@ -5,6 +5,11 @@ import play.api.libs.json.Json
 import com.datastax.driver.core.Row
 import java.util.UUID
 
+object Difficulty extends Enumeration {
+
+  val Easy = Value
+}
+
 case class Author(firstName: String, lastName: String, bio: Option[String])
 
 case class Recipe(
@@ -26,14 +31,15 @@ class Recipes extends CTable[Recipes, Recipe]("recipes") {
   }
 
   val url = column[String]
-  val description = optColumn[String]("description")
-  val ingredients = seqColumn[String]("ingredients")
-  val author = jsonColumn[Author]("author")
-  val servings = optColumn[Int]("servings")
-  val lastCheckedAt = column[java.util.Date]("last_checked_at")
-  val props = mapColumn[String, String]("props")
-  val uid = column[UUID]("uid")
-  val tags = setColumn[String]("tags")
+  val description = optColumn[String]
+  val ingredients = seqColumn[String]
+  val author = jsonColumn[Author]
+  val servings = optColumn[Int]
+  val lastCheckedAt = column[java.util.Date]
+  val props = mapColumn[String, String]
+  val uid = column[UUID]
+  val tags = setColumn[String]
+  val difficulty = enumColumn(Difficulty)
 }
 
 object Recipes extends Recipes
