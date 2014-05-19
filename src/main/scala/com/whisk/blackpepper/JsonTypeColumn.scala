@@ -31,7 +31,7 @@ class JsonColumn[RR: Format](val name: String) extends Column[RR] with JsonColum
   def toCType(v: RR): AnyRef = valueToString(v)
 
   def optional(r: Row): Option[RR] = {
-    fromString(r.getString(name))
+    Option(r.getString(name)).flatMap(v => fromString(v))
   }
 }
 
@@ -42,7 +42,7 @@ class OptionalJsonColumn[RR: Format](val name: String) extends OptionalColumn[RR
   }
 
   def optional(r: Row): Option[RR] = {
-    fromString(r.getString(name))
+    Option(r.getString(name)).flatMap(v => fromString(v))
   }
 
 }
