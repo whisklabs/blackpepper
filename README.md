@@ -9,8 +9,10 @@ Consider [BlackpepperSpec.scala](https://github.com/whiskteam/blackpepper/blob/m
 
 ## Dependency
 
+Supported versions of Scala: 2.11, 2.10
+
     resolvers += "Whisk Snapshots" at "http://whisklabs.github.io/mvn-repo/snapshots/"
     
-    libraryDependencies += "com.whisk" %% "blackpepper" % "0.1.0-87d22b3"
+    libraryDependencies += "com.whisk" %% "blackpepper" % "0.1.0-5a4f971"
 
     
