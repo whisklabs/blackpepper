@@ -11,6 +11,10 @@ object Implicits {
     new ModifyColumn[RR](col)
   }
 
+  implicit def counterColumnToAssignmentcol(col: CounterColumn) = {
+    new ModifyCounterColumn(col)
+  }
+
   implicit def simpleOptionalColumnToAssignment[RR: CSPrimitive](col: OptionalColumn[RR]) = {
     new ModifyColumnOptional[RR](col)
   }

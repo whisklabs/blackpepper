@@ -31,6 +31,15 @@ class ModifyColumn[RR](col: AbstractColumn[RR]) extends AbstractModifyColumn[RR]
   def toCType(v: RR): AnyRef = col.toCType(v)
 }
 
+class ModifyCounterColumn(col: CounterColumn) extends AbstractModifyColumn[Long](col.name) {
+
+  def toCType(v: Long): AnyRef = col.toCType(v)
+
+  def incr: Assignment = incr(1)
+
+  def incr(v: Long): Assignment = QueryBuilder.incr(col.name, v)
+}
+
 class SeqLikeModifyColumn[RR](col: AbstractSeqColumn[RR]) extends ModifyColumn[Seq[RR]](col) {
 
   def prepend(value: RR): Assignment = QueryBuilder.prepend(col.name, col.valueToCType(value))

@@ -47,6 +47,8 @@ class PrimitiveColumn[RR: CSPrimitive](val name: String) extends Column[RR] {
     implicitly[CSPrimitive[RR]].fromRow(r, name)
 }
 
+final class CounterColumn(override val name: String) extends PrimitiveColumn[Long](name)
+
 class EnumColumn[EnumType <: Enumeration](enum: EnumType, val name: String) extends Column[EnumType#Value] {
 
   def toCType(v: EnumType#Value): AnyRef = v.toString

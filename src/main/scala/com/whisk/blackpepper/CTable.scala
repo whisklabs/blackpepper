@@ -36,6 +36,12 @@ object CTableMacros {
     c.Expr[OptionalPrimitiveColumn[T]](q"""new com.whisk.blackpepper.OptionalPrimitiveColumn[$tpe]($field)""")
   }
 
+  def counterColumnImpl(c: Context): c.Expr[CounterColumn] = {
+    import c.universe._
+    val field: String = columnName(c)
+    c.Expr[CounterColumn](q"""new com.whisk.blackpepper.CounterColumn($field)""")
+  }
+
   def jsonColumnImpl[T: c.WeakTypeTag](c: Context): c.Expr[JsonColumn[T]] = {
     import c.universe._
     val tpe = weakTypeOf[T]
@@ -115,6 +121,10 @@ abstract class CTable[T <: CTable[T, R], R](val tableName: String) {
 
   def optColumn[RR: CSPrimitive](name: String): OptionalPrimitiveColumn[RR] =
     new OptionalPrimitiveColumn[RR](name)
+
+  def counterColumn: CounterColumn = macro CTableMacros.counterColumnImpl
+
+  def counterColumn(name: String): CounterColumn = new CounterColumn(name)
 
   def jsonColumn[RR]: JsonColumn[RR] = macro CTableMacros.jsonColumnImpl[RR]
 
