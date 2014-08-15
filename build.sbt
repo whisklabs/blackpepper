@@ -4,7 +4,7 @@ organization := "com.whisk"
 
 val gitHeadCommitSha = settingKey[String]("current git commit SHA")
 
-val paradiseVersion = "2.1.0-M1"
+val paradiseVersion = "2.0.0"
 
 gitHeadCommitSha in ThisBuild := Process("git rev-parse --short HEAD").lines.head
 
@@ -25,7 +25,8 @@ resolvers += Resolver.sonatypeRepo("releases")
 addCompilerPlugin("org.scalamacros" % "paradise" % paradiseVersion cross CrossVersion.full)
 
 libraryDependencies ++= Seq(
-  "com.typesafe.play" %% "play-json" % "2.3.0-RC1",
+  "com.typesafe.play" %% "play-json" % "2.3.0",
+  "com.typesafe.play" %% "play-iteratees" % "2.3.0",
   "com.datastax.cassandra" % "cassandra-driver-core" % "2.0.2",
   "org.apache.cassandra" % "cassandra-all" % "2.0.2" % "test",
   "org.specs2" %% "specs2-core" % "2.3.11" % "test")
