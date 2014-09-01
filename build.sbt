@@ -25,9 +25,9 @@ resolvers += Resolver.sonatypeRepo("releases")
 addCompilerPlugin("org.scalamacros" % "paradise" % paradiseVersion cross CrossVersion.full)
 
 libraryDependencies ++= Seq(
-  "com.typesafe.play" %% "play-json" % "2.3.3",
-  "com.typesafe.play" %% "play-iteratees" % "2.3.3",
-  "com.datastax.cassandra" % "cassandra-driver-core" % "2.0.5",
+  "com.typesafe.play" %% "play-json" % "2.3.4",
+  "com.typesafe.play" %% "play-iteratees" % "2.3.4",
+  "com.datastax.cassandra" % "cassandra-driver-core" % "2.1.0",
   "org.apache.cassandra" % "cassandra-all" % "2.0.2" % "test",
   "org.specs2" %% "specs2-core" % "2.3.11" % "test")
 
