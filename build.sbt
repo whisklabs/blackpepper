@@ -28,7 +28,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-json" % "2.3.4",
   "com.typesafe.play" %% "play-iteratees" % "2.3.4",
   "com.datastax.cassandra" % "cassandra-driver-core" % "2.1.0",
-  "org.apache.cassandra" % "cassandra-all" % "2.0.2" % "test",
+  "org.apache.cassandra" % "cassandra-all" % "2.0.10" % "test",
   "org.specs2" %% "specs2-core" % "2.3.11" % "test")
 
 libraryDependencies ++= (
