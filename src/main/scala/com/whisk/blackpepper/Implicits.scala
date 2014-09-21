@@ -4,7 +4,7 @@ import play.api.libs.json.Format
 
 object Implicits {
 
-  implicit def columnToQueryColumn[RR: CSPrimitive](col: Column[RR]) =
+  implicit def columnToQueryColumn[RR](col: Column[RR]) =
     new QueryColumn(col)
 
   implicit def simpleColumnToAssignment[RR: CSPrimitive](col: AbstractColumn[RR]) = {

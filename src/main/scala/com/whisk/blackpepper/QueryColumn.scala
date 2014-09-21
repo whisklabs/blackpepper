@@ -5,19 +5,19 @@ import play.api.libs.json.{ Json, Format }
 import scala.collection.JavaConverters._
 import com.datastax.driver.core.Row
 
-abstract class AbstractQueryColumn[RR: CSPrimitive](col: Column[RR]) {
+abstract class AbstractQueryColumn[RR](col: Column[RR]) {
 
-  def eqs(value: RR): Clause = QueryBuilder.eq(col.name, CSPrimitive[RR].toCType(value))
+  def eqs(value: RR): Clause = QueryBuilder.eq(col.name, col.toCType(value))
 
-  def in[L <% Traversable[RR]](vs: L) = QueryBuilder.in(col.name, vs.map(CSPrimitive[RR].toCType).toSeq: _*)
+  def in[L <% Traversable[RR]](vs: L) = QueryBuilder.in(col.name, vs.map(col.toCType).toSeq: _*)
 
-  def gt(value: RR): Clause = QueryBuilder.gt(col.name, CSPrimitive[RR].toCType(value))
-  def gte(value: RR): Clause = QueryBuilder.gte(col.name, CSPrimitive[RR].toCType(value))
-  def lt(value: RR): Clause = QueryBuilder.lt(col.name, CSPrimitive[RR].toCType(value))
-  def lte(value: RR): Clause = QueryBuilder.lte(col.name, CSPrimitive[RR].toCType(value))
+  def gt(value: RR): Clause = QueryBuilder.gt(col.name, col.toCType(value))
+  def gte(value: RR): Clause = QueryBuilder.gte(col.name, col.toCType(value))
+  def lt(value: RR): Clause = QueryBuilder.lt(col.name, col.toCType(value))
+  def lte(value: RR): Clause = QueryBuilder.lte(col.name, col.toCType(value))
 }
 
-class QueryColumn[RR: CSPrimitive](col: Column[RR]) extends AbstractQueryColumn[RR](col)
+class QueryColumn[RR](col: Column[RR]) extends AbstractQueryColumn[RR](col)
 
 abstract class AbstractModifyColumn[RR](name: String) {
 
