@@ -27,7 +27,7 @@ addCompilerPlugin("org.scalamacros" % "paradise" % paradiseVersion cross CrossVe
 libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-json" % "2.3.4",
   "com.typesafe.play" %% "play-iteratees" % "2.3.4",
-  "com.datastax.cassandra" % "cassandra-driver-core" % "2.1.0",
+  "com.datastax.cassandra" % "cassandra-driver-core" % "2.1.1",
   "org.apache.cassandra" % "cassandra-all" % "2.0.10" % "test",
   "org.specs2" %% "specs2-core" % "2.3.11" % "test")
 
