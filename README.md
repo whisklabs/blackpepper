@@ -13,6 +13,6 @@ Supported versions of Scala: 2.11, 2.10
 
     resolvers += "Whisk Snapshots" at "http://whisklabs.github.io/mvn-repo/snapshots/"
     
-    libraryDependencies += "com.whisk" %% "blackpepper" % "0.1.0-caff3a6"
+    libraryDependencies += "com.whisk" %% "blackpepper" % "0.1.0-a65f9c0"
 
     
