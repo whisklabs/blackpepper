@@ -10,9 +10,9 @@ gitHeadCommitSha in ThisBuild := Process("git rev-parse --short HEAD").lines.hea
 
 version in ThisBuild := "0.1.0-" + gitHeadCommitSha.value
 
-scalaVersion := "2.11.4"
+scalaVersion := "2.11.6"
 
-crossScalaVersions := Seq("2.11.4", "2.10.4")
+crossScalaVersions := Seq("2.11.6", "2.10.5")
 
 scalariformSettings
 
@@ -25,9 +25,9 @@ resolvers += Resolver.sonatypeRepo("releases")
 addCompilerPlugin("org.scalamacros" % "paradise" % paradiseVersion cross CrossVersion.full)
 
 libraryDependencies ++= Seq(
-  "com.typesafe.play" %% "play-json" % "2.3.7",
-  "com.typesafe.play" %% "play-iteratees" % "2.3.7",
-  "com.datastax.cassandra" % "cassandra-driver-core" % "2.1.4",
+  "com.typesafe.play" %% "play-json" % "2.3.8",
+  "com.typesafe.play" %% "play-iteratees" % "2.3.8",
+  "com.datastax.cassandra" % "cassandra-driver-core" % "2.1.5",
   "org.apache.cassandra" % "cassandra-all" % "2.0.10" % "test",
   "org.specs2" %% "specs2-core" % "2.3.11" % "test")
 
