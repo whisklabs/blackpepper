@@ -1,13 +1,11 @@
 package com.whisk.blackpepper
 
-import play.api.libs.json.Format
-
 object Implicits {
 
   implicit def columnToQueryColumn[RR](col: Column[RR]) =
     new QueryColumn(col)
 
-  implicit def simpleColumnToAssignment[RR: CSPrimitive](col: AbstractColumn[RR]) = {
+  implicit def columnToAssignment[RR](col: AbstractColumn[RR]) = {
     new ModifyColumn[RR](col)
   }
 
@@ -15,16 +13,8 @@ object Implicits {
     new ModifyCounterColumn(col)
   }
 
-  implicit def simpleOptionalColumnToAssignment[RR: CSPrimitive](col: OptionalColumn[RR]) = {
+  implicit def optionalColumnToAssignment[RR](col: OptionalColumn[RR]) = {
     new ModifyColumnOptional[RR](col)
-  }
-
-  implicit def enumColumnToAssignment[RR <: Enumeration](col: EnumColumn[RR]) = {
-    new ModifyColumn[RR#Value](col)
-  }
-
-  implicit def jsonColumnToAssignment[RR: Format](col: JsonColumn[RR]) = {
-    new ModifyColumn[RR](col)
   }
 
   implicit def seqColumnToAssignment[RR](col: AbstractSeqColumn[RR]) = {

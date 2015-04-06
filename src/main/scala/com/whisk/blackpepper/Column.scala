@@ -53,8 +53,9 @@ class EnumColumn[EnumType <: Enumeration](enum: EnumType, val name: String) exte
 
   def toCType(v: EnumType#Value): AnyRef = v.toString
 
-  def optional(r: Row): Option[EnumType#Value] =
-    Option(r.getString(name)).flatMap(s => enum.values.find(_.toString == s))
+  def optional(r: Row): Option[EnumType#Value] = {
+    if (r.isNull(name)) None else Some(r.getString(name)).flatMap(s => enum.values.find(_.toString == s))
+  }
 
 }
 
@@ -89,7 +90,8 @@ abstract class AbstractSeqColumn[RR] extends Column[Seq[RR]] with CollectionValu
   }
 
   override def optional(r: Row): Option[Seq[RR]] = {
-    Try {
+    if (r.isNull(name)) None
+    else Try {
       r.getList(name, valueCls).asScala.map(e => valueFromCType(e.asInstanceOf[AnyRef])).toList
     }.toOption
   }
@@ -107,7 +109,8 @@ abstract class AbstractSetColumn[RR] extends Column[Set[RR]] with CollectionValu
   }
 
   override def optional(r: Row): Option[Set[RR]] = {
-    Try {
+    if (r.isNull(name)) None
+    else Try {
       r.getSet(name, valueCls).asScala.map(e => valueFromCType(e.asInstanceOf[AnyRef])).toSet
     }.toOption
   }
@@ -131,7 +134,8 @@ abstract class AbstractMapColumn[K, V] extends Column[Map[K, V]] with Collection
   }
 
   def optional(r: Row): Option[Map[K, V]] = {
-    Option(r.getMap(name, keyCls, valueCls)).map(_.asScala.map {
+    if (r.isNull(name)) None
+    else Option(r.getMap(name, keyCls, valueCls)).map(_.asScala.map {
       case (k, v) =>
         keyFromCType(k.asInstanceOf[AnyRef]) -> valueFromCType(v.asInstanceOf[AnyRef])
     }.toMap)
