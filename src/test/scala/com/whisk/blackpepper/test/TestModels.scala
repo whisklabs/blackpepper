@@ -30,16 +30,16 @@ class Recipes extends CTable[Recipes, Recipe]("recipes") {
     Recipe(url(r), description(r), ingredients(r), author.optional(r), servings(r), lastCheckedAt(r), props(r), tags(r))
   }
 
-  val url = column[String]
-  val description = optColumn[String]
-  val ingredients = seqColumn[String]
-  val author = jsonColumn[Author]
-  val servings = optColumn[Int]
-  val lastCheckedAt = column[java.util.Date]
-  val props = mapColumn[String, String]
-  val uid = column[UUID]
-  val tags = setColumn[String]
-  val difficulty = enumColumn(Difficulty)
+  val url = column[String]("url")
+  val description = optColumn[String]("description")
+  val ingredients = seqColumn[String]("ingredients")
+  val author = jsonColumn[Author]("author")
+  val servings = optColumn[Int]("servings")
+  val lastCheckedAt = column[java.util.Date]("last_checked_at")
+  val props = mapColumn[String, String]("props")
+  val uid = column[UUID]("uid")
+  val tags = setColumn[String]("tags")
+  val difficulty = enumColumn(Difficulty, "difficulty")
 }
 
 object Recipes extends Recipes
