@@ -32,5 +32,5 @@ libraryDependencies ++= Seq(
   "org.specs2" %% "specs2-core" % "2.3.11" % "test")
 
 bintrayRepository := {
-  if (version.value.trim.endsWith(gitHeadCommitSha.value)) "meven-snapshots" else "maven"
+  if (version.value.trim.endsWith(gitHeadCommitSha.value)) "maven-snapshots" else "maven"
 }
