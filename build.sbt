@@ -6,7 +6,11 @@ val gitHeadCommitSha = settingKey[String]("current git commit SHA")
 
 gitHeadCommitSha in ThisBuild := Process("git rev-parse --short HEAD").lines.head
 
-version in ThisBuild := "0.2.0-" + gitHeadCommitSha.value
+version in ThisBuild := "0.2.0"
+
+licenses += ("MIT", url("http://opensource.org/licenses/MIT"))
+
+bintrayOrganization := Some("whisk")
 
 scalaVersion := "2.11.7"
 
@@ -27,8 +31,6 @@ libraryDependencies ++= Seq(
   "org.apache.cassandra" % "cassandra-all" % "2.0.10" % "test",
   "org.specs2" %% "specs2-core" % "2.3.11" % "test")
 
-publishTo := {
-  val dir = if (version.value.trim.endsWith(gitHeadCommitSha.value)) "snapshots" else "releases"
-  val repo = Path.userHome / "mvn-repo" / dir
-  Some(Resolver.file("file", repo) )
+bintrayRepository := {
+  if (version.value.trim.endsWith(gitHeadCommitSha.value)) "meven-snapshots" else "maven"
 }
