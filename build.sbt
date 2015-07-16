@@ -6,7 +6,7 @@ val gitHeadCommitSha = settingKey[String]("current git commit SHA")
 
 gitHeadCommitSha in ThisBuild := Process("git rev-parse --short HEAD").lines.head
 
-version in ThisBuild := "0.1.0-" + gitHeadCommitSha.value
+version in ThisBuild := "0.2.0-" + gitHeadCommitSha.value
 
 scalaVersion := "2.11.7"
 
@@ -19,10 +19,6 @@ fork in Test := true
 scalariformSettings
 
 scalacOptions ++= Seq("-Xcheckinit", "-encoding", "utf8", "-deprecation", "-unchecked", "-feature", "-language:_")
-
-resolvers += "typesafe" at "http://repo.typesafe.com/typesafe/releases/"
-
-resolvers += Resolver.sonatypeRepo("releases")
 
 libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-json" % "2.4.2",
