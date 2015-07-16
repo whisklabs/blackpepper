@@ -12,6 +12,10 @@ scalaVersion := "2.11.7"
 
 crossScalaVersions := Seq("2.11.7", "2.10.5")
 
+parallelExecution in Test := false
+
+fork in Test := true
+
 scalariformSettings
 
 scalacOptions ++= Seq("-Xcheckinit", "-encoding", "utf8", "-deprecation", "-unchecked", "-feature", "-language:_")
