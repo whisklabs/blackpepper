@@ -11,8 +11,8 @@ Consider [BlackpepperSpec.scala](https://github.com/whiskteam/blackpepper/blob/m
 
 Supported versions of Scala: 2.11, 2.10
 
-    resolvers += "Whisk Snapshots" at "http://whisklabs.github.io/mvn-repo/snapshots/"
+    resolvers += "Whisk Releases" at "https://dl.bintray.com/whisk/maven"
     
-    libraryDependencies += "com.whisk" %% "blackpepper" % "0.1.0-2e1b29c"
+    libraryDependencies += "com.whisk" %% "blackpepper" % "0.2.1"
 
     
