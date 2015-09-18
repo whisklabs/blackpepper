@@ -124,8 +124,10 @@ abstract class AbstractMapColumn[K, V] extends Column[Map[K, V]] with Collection
 
   def keyFromCType(c: AnyRef): K
 
-  def valuesToCType(values: Traversable[(K, V)]): JavaMap[AnyRef, AnyRef] =
-    values.map({ case (k, v) => keyToCType(k) -> valueToCType(v) }).toMap.asJava
+  def valuesToCType(values: Traversable[(K, V)]): JavaMap[AnyRef, AnyRef] = {
+    val map: Map[AnyRef, AnyRef] = values.map({ case (k, v) => keyToCType(k) -> valueToCType(v) })(collection.breakOut)
+    map.asJava
+  }
 
   override def toCType(values: Map[K, V]): AnyRef = valuesToCType(values)
 
@@ -138,7 +140,7 @@ abstract class AbstractMapColumn[K, V] extends Column[Map[K, V]] with Collection
     else Option(r.getMap(name, keyCls, valueCls)).map(_.asScala.map {
       case (k, v) =>
         keyFromCType(k.asInstanceOf[AnyRef]) -> valueFromCType(v.asInstanceOf[AnyRef])
-    }.toMap)
+    }(collection.breakOut))
   }
 }
 
