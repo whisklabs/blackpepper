@@ -5,55 +5,59 @@ import scala.concurrent.{ Future, ExecutionContext }
 import scala.collection.JavaConverters._
 import play.api.libs.iteratee.{ Iteratee, Enumerator }
 
-trait ExecutableStatement extends CassandraResultSetOperations {
+abstract class ExecutableStatement[SessionType: SessionProvider] extends CassandraResultSetOperations {
 
   def qb: Statement
 
-  def execute()(implicit session: Session, ec: ExecutionContext): Future[ResultSet] =
-    session.executeAsync(qb)
+  def execute()(implicit st: SessionType, ec: ExecutionContext): Future[ResultSet] =
+    implicitly[SessionProvider[SessionType]].session(st).executeAsync(qb)
 
-  def withConsistencyLevel(cl: ConsistencyLevel): ExecutableStatement = {
-    new BasicExecutableStatement(qb.setConsistencyLevel(cl))
+  def withConsistencyLevel(cl: ConsistencyLevel): ExecutableStatement[SessionType] = {
+    new BasicExecutableStatement[SessionType](qb.setConsistencyLevel(cl))
   }
 }
 
-class BasicExecutableStatement(override val qb: Statement) extends ExecutableStatement
+class BasicExecutableStatement[SessionType: SessionProvider](override val qb: Statement) extends ExecutableStatement[SessionType]
 
-trait ExecutableQuery[T <: CTable[T, _], R] extends CassandraResultSetOperations {
+abstract class ExecutableQuery[T <: QueryTable[T, _, SessionType], R, SessionType: SessionProvider] extends CassandraResultSetOperations {
 
   def qb: Statement
-  def table: CTable[T, _]
+  def table: QueryTable[T, _, SessionType]
   def fromRow(r: Row): R
 
-  def withConsistencyLevel(cl: ConsistencyLevel): ExecutableQuery[T, R] = {
+  def withConsistencyLevel(cl: ConsistencyLevel): ExecutableQuery[T, R, SessionType] = {
     def f = fromRow _
     val t = table
-    new ExecutableQuery[T, R] {
+    new ExecutableQuery[T, R, SessionType] {
       override def qb: Statement = qb.setConsistencyLevel(cl)
 
       override def fromRow(r: Row): R = f(r)
 
-      override def table: CTable[T, _] = t
+      override def table = t
     }
   }
 
-  def execute()(implicit session: Session, ec: ExecutionContext): Future[ResultSet] =
-    session.executeAsync(qb)
-
-  def fetchSync(implicit session: Session): Seq[R] = {
-    session.execute(qb).all().asScala.toSeq.map(fromRow)
+  private def session(st: SessionType): Session = {
+    implicitly[SessionProvider[SessionType]].session(st)
   }
 
-  def fetch(implicit session: Session, ec: ExecutionContext): Future[Seq[R]] = {
-    fetchEnumerator(session, ec).flatMap(_.run(Iteratee.getChunks))
+  def execute()(implicit st: SessionType, ec: ExecutionContext): Future[ResultSet] =
+    session(st).executeAsync(qb)
+
+  def fetchSync(implicit st: SessionType): Seq[R] = {
+    session(st).execute(qb).all().asScala.toSeq.map(fromRow)
   }
 
-  def fetchEnumerator(implicit session: Session, ec: ExecutionContext): Future[Enumerator[R]] = {
-    session.executeAsync(qb).map(rs =>
+  def fetch(implicit st: SessionType, ec: ExecutionContext): Future[Seq[R]] = {
+    fetchEnumerator(st, ec).flatMap(_.run(Iteratee.getChunks))
+  }
+
+  def fetchEnumerator(implicit st: SessionType, ec: ExecutionContext): Future[Enumerator[R]] = {
+    session(st).executeAsync(qb).map(rs =>
       Enumerator.enumerate(rs.iterator().asScala).map(fromRow))
   }
 
-  def one(implicit session: Session, ec: ExecutionContext): Future[Option[R]] = {
-    session.executeAsync(qb).map(r => Option(r.one()).map(fromRow))
+  def one(implicit st: SessionType, ec: ExecutionContext): Future[Option[R]] = {
+    session(st).executeAsync(qb).map(r => Option(r.one()).map(fromRow))
   }
 }
