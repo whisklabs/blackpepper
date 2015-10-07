@@ -27,7 +27,7 @@ scalacOptions ++= Seq("-Xcheckinit", "-encoding", "utf8", "-deprecation", "-unch
 libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-json" % "2.4.3",
   "com.typesafe.play" %% "play-iteratees" % "2.4.3",
-  "com.datastax.cassandra" % "cassandra-driver-core" % "2.1.7.1",
+  "com.datastax.cassandra" % "cassandra-driver-core" % "2.1.8",
   "org.apache.cassandra" % "cassandra-all" % "2.0.10" % "test",
   "org.specs2" %% "specs2-core" % "2.3.11" % "test")
 
